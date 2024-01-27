@@ -2,6 +2,10 @@ import express from 'express';
 import * as dotenv from 'dotenv';
 import { Configuration, OpenAIApi } from 'openai';
 
+// import express from 'express';
+// import * as dotenv from 'dotenv';
+// import { Configuration, OpenAIAPI } from 'openai';
+
 dotenv.config();
 
 const router = express.Router();
@@ -20,18 +24,19 @@ router.route('/').post(async (req, res) => {
   try {
     const { prompt } = req.body;
 
-    const aiResponse = await openai.createImage({
-      prompt,
+    const response = await openai.createImage({
+      model: "dall-e-2",
+      prompt: prompt,
       n: 1,
-      size: '1024x1024',
-      response_format: 'b64_json',
+      size: "1024x1024",
     });
-
-    const image = aiResponse.data.data[0].b64_json;
-    res.status(200).json({ photo: image });
+    // console.log(response.data.data[0].url);
+    // image_url = response.data.data[0].url;
+    const generatedText = response.data.data[0].url;
+    res.status(200).json({ photo: generatedText });
   } catch (error) {
-    console.error(error);
-    res.status(500).send(error?.response.data.error.message || 'Something went wrong');
+    console.error(error?.response?.data?.error?.message);
+    res.status(500).send(error?.response?.data?.error?.message || 'Something went wrong');
   }
 });
 
